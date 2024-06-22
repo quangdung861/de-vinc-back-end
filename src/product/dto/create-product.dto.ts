@@ -11,5 +11,5 @@ export class CreateProductDto {
 
     status: number;
 
-    images: string;
+    images: string[];
 }

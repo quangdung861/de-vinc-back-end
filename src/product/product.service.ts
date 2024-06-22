@@ -12,10 +12,13 @@ export class ProductService {
     @InjectRepository(Product) private productRepository: Repository<Product>,
   ) { }
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
+  async create(createProductDto: CreateProductDto) {
+    const images = createProductDto.images.join('<&space>');
+
     try {
       const res = await this.productRepository.save({
-        ...createProductDto
+        ...createProductDto,
+        images
       })
 
       return await this.productRepository.findOneBy({ id: res.id });
@@ -29,7 +32,7 @@ export class ProductService {
     const page = Number(query.page) || 1;
     const search = query.search || ``;
     const skip = (page - 1) * items_per_page;
-    
+
     const [res, total] = await this.productRepository.findAndCount({
       where: [
         { name: Like('%' + search + '%') },
