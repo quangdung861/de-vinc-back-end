@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Category } from "src/category/entities/category.entity";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Product {
@@ -25,6 +26,9 @@ export class Product {
 
     @Column()
     images: string;
+
+    @ManyToOne(() => Category, (category) => category.products)
+    category: Category;
 
     @CreateDateColumn()
     created_at: Date;
