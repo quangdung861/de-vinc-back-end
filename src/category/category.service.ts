@@ -22,8 +22,19 @@ export class CategoryService {
     }
   }
 
-  findAll() {
-    return `This action returns all category`;
+  async findAll(): Promise<{ data: Category[] }> {
+    try {
+      const result = await this.categoryRepository.find({
+        order: {
+          created_at: 'DESC',
+        },
+      })
+      return ({
+        data: result,
+      })
+    } catch (error) {
+      throw new HttpException('Can not find all Category', HttpStatus.BAD_REQUEST)
+    }
   }
 
   findOne(id: number) {

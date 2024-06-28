@@ -1,24 +1,30 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Like, Repository, UpdateResult } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 @Injectable()
 export class ProductService {
 
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
+    @InjectRepository(Category) private categoryRepository: Repository<Category>,
   ) { }
 
   async create(createProductDto: CreateProductDto) {
+    const { categoryId, ...productData } = createProductDto;
     const images = createProductDto.images.join('<&space>');
+
+    const category = await this.categoryRepository.findOneBy({ id: categoryId });
 
     try {
       const res = await this.productRepository.save({
-        ...createProductDto,
-        images
+        ...productData,
+        images,
+        ...(category && { category: category })
       })
 
       return await this.productRepository.findOneBy({ id: res.id });
@@ -59,12 +65,35 @@ export class ProductService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number) {
+    const result = await this.productRepository.findOne({
+      where: { id },
+      relations: ['category'],
+    })
+    return result;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const { categoryId, images, ...productData } = updateProductDto;
+
+    const imageFormat = images.join('<&space>');
+    let category;
+    if (categoryId) {
+      category = await this.categoryRepository.findOneBy({ id: categoryId })
+    }
+
+    try {
+      await this.productRepository.update(id, {
+        ...productData,
+        images: imageFormat,
+        ...(category && { category })
+      })
+      const updatedProduct = await this.productRepository.findOneBy({ id });
+      return updatedProduct;
+    } catch (error) {
+      console.log("🚀 ~ ProductService ~ update ~ error:", error)
+      throw new HttpException('Can not update product', HttpStatus.BAD_REQUEST)
+    }
   }
 
   remove(id: number) {
