@@ -37,15 +37,28 @@ export class ProductService {
     const items_per_page = Number(query.items_per_page) || 10;
     const page = Number(query.page) || 1;
     const search = query.search || ``;
+    const sort = query.sort || 'DESC';
+    const categoryId = query.categoryId || null;
     const skip = (page - 1) * items_per_page;
 
+    const whereConditions: any[] = [
+      {
+        name: Like('%' + search + '%')
+      },
+      {
+        description: Like('%' + search + '%')
+      },
+    ];
+
+    if (categoryId) {
+      whereConditions.forEach(item => item['categoryId'] = categoryId);
+    }
+
     const [res, total] = await this.productRepository.findAndCount({
-      where: [
-        { name: Like('%' + search + '%') },
-        { description: Like('%' + search + '%') }
-      ],
+      where: whereConditions,
+      relations: ['category'],
       order: {
-        created_at: 'DESC',
+        created_at: sort,
       },
       take: items_per_page,
       skip: skip,
