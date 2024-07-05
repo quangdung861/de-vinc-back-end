@@ -37,7 +37,8 @@ export class ProductService {
     const items_per_page = Number(query.items_per_page) || 10;
     const page = Number(query.page) || 1;
     const search = query.search || ``;
-    const sort = query.sort || 'DESC';
+    const sortValue = query.sortValue || `created_at`;
+    const order = query.order || 'DESC';
     const categoryId = query.categoryId || null;
     const skip = (page - 1) * items_per_page;
 
@@ -58,7 +59,7 @@ export class ProductService {
       where: whereConditions,
       relations: ['category'],
       order: {
-        created_at: sort,
+        [sortValue]: order,
       },
       take: items_per_page,
       skip: skip,
@@ -104,7 +105,6 @@ export class ProductService {
       const updatedProduct = await this.productRepository.findOneBy({ id });
       return updatedProduct;
     } catch (error) {
-      console.log("🚀 ~ ProductService ~ update ~ error:", error)
       throw new HttpException('Can not update product', HttpStatus.BAD_REQUEST)
     }
   }
