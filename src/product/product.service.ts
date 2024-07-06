@@ -79,6 +79,8 @@ export class ProductService {
     }
   }
 
+  async search
+
   async findOne(id: number) {
     const result = await this.productRepository.findOne({
       where: { id },

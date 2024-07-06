@@ -6,6 +6,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { FilterProductDto } from './dto/filter-product';
 import { storageConfig } from 'helpers/config';
 import { extname } from 'path';
+import { SearchProductDto } from './dto/search-product.dto';
 
 @Controller('products')
 export class ProductController {
@@ -46,6 +47,11 @@ export class ProductController {
   @Get()
   findAll(@Query() query: FilterProductDto): Promise<any> {
     return this.productService.findAll(query);
+  }
+
+  @Get('search')
+  search(@Query() query: SearchProductDto): Promise<any> {
+    return this.productService.searchAll(query);
   }
 
   @Get(':id')
