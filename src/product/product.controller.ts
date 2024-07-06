@@ -49,10 +49,10 @@ export class ProductController {
     return this.productService.findAll(query);
   }
 
-  @Get('search')
-  search(@Query() query: SearchProductDto): Promise<any> {
-    return this.productService.searchAll(query);
-  }
+  // @Get('search')
+  // search(@Query() query: SearchProductDto): Promise<any> {
+  //   return this.productService.searchAll(query);
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

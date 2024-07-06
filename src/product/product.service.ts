@@ -79,7 +79,7 @@ export class ProductService {
     }
   }
 
-  async search
+  // async search
 
   async findOne(id: number) {
     const result = await this.productRepository.findOne({

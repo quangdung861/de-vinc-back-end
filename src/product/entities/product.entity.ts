@@ -30,12 +30,12 @@ export class Product {
     @Column({ default: false })
     bestSelling: boolean;
 
-    @ManyToOne(() => Category, (category) => category.products)
+    @ManyToOne(() => Category, { nullable: true }) // Đặt nullable: true ở đây
     @JoinColumn({ name: 'categoryId' })
-    category: Category;
+    category: Category | null;
 
-    @Column()
-    categoryId: number;
+    @Column({ nullable: true, default: null }) // Đặt nullable: true ở đây
+    categoryId: number | null;
 
     @CreateDateColumn()
     created_at: Date;
