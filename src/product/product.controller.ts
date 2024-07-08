@@ -46,13 +46,13 @@ export class ProductController {
 
   @Get()
   findAll(@Query() query: FilterProductDto): Promise<any> {
-    return this.productService.findAll(query);
+    return this.productService.findAll({query});
   }
 
-  // @Get('search')
-  // search(@Query() query: SearchProductDto): Promise<any> {
-  //   return this.productService.searchAll(query);
-  // }
+  @Get('search')
+  search(@Query() query: SearchProductDto): Promise<any> {
+    return this.productService.findAll({query, isSearch: true});
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

@@ -33,7 +33,7 @@ export class ProductService {
     }
   }
 
-  async findAll(query): Promise<any> {
+  async findAll({query, isSearch = false}): Promise<any> {
     const items_per_page = Number(query.items_per_page) || 10;
     const page = Number(query.page) || 1;
     const search = query.search || ``;
@@ -41,6 +41,10 @@ export class ProductService {
     const order = query.order || 'DESC';
     const categoryId = query.categoryId || null;
     const skip = (page - 1) * items_per_page;
+
+    if (isSearch) {
+      if (!search) return { data: [], total: 0 }
+    }
 
     const whereConditions: any[] = [
       {
@@ -79,7 +83,9 @@ export class ProductService {
     }
   }
 
-  // async search
+  // async searchAll(query): Promise<any> {
+
+  // }
 
   async findOne(id: number) {
     const result = await this.productRepository.findOne({
