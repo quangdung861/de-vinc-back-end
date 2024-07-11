@@ -24,7 +24,7 @@ export class Product {
     @Column({ nullable: true, default: null })
     slug: string;
 
-    @Column()
+    @Column({ type: 'longtext' })
     images: string;
 
     @Column({ default: false })

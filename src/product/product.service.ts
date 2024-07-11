@@ -99,20 +99,18 @@ export class ProductService {
     const { categoryId, images, ...productData } = updateProductDto;
 
     const imageFormat = images.join('<&space>');
-    let category;
-    if (categoryId) {
-      category = await this.categoryRepository.findOneBy({ id: categoryId })
-    }
+    const category = await this.categoryRepository.findOneBy({ id: categoryId });
 
     try {
       await this.productRepository.update(id, {
         ...productData,
         images: imageFormat,
-        ...(category && { category })
+        ...(category && { category: category })
       })
       const updatedProduct = await this.productRepository.findOneBy({ id });
       return updatedProduct;
     } catch (error) {
+      console.log("🚀 ~ ProductService ~ update ~ error:", error)
       throw new HttpException('Can not update product', HttpStatus.BAD_REQUEST)
     }
   }
