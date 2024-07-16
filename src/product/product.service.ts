@@ -33,30 +33,37 @@ export class ProductService {
     }
   }
 
-  async findAll({query, isSearch = false}): Promise<any> {
+  async findAll({ query, isSearch = false }): Promise<any> {
     const items_per_page = Number(query.items_per_page) || 10;
     const page = Number(query.page) || 1;
-    const search = query.search || ``;
+    const q = query.q || ``;
     const sortValue = query.sortValue || `created_at`;
     const order = query.order || 'DESC';
     const categoryId = query.categoryId || null;
     const skip = (page - 1) * items_per_page;
+    const bestSelling = query.bestSelling || null;
 
     if (isSearch) {
-      if (!search) return { data: [], total: 0 }
+      if (!q) return { data: [], total: 0 }
     }
 
     const whereConditions: any[] = [
       {
-        name: Like('%' + search + '%')
+        name: Like('%' + q + '%')
       },
       {
-        description: Like('%' + search + '%')
+        description: Like('%' + q + '%')
       },
     ];
 
     if (categoryId) {
       whereConditions.forEach(item => item['categoryId'] = categoryId);
+    }
+
+    if (bestSelling !== null) {
+      whereConditions.forEach((condition) => {
+        condition.bestSelling = bestSelling;
+      });
     }
 
     const [res, total] = await this.productRepository.findAndCount({
@@ -73,8 +80,15 @@ export class ProductService {
     const nextPage = page + 1 > lastPage ? null : page + 1;
     const prevPage = page - 1 < 1 ? null : page - 1;
 
+    const newRes = res.map((item) => {
+      return {
+        ...item,
+        reducedPercent: item?.reducedPrice ? Math.round(((item?.price - item?.reducedPrice) / item?.price) * 100) : 0
+      }
+    })
+
     return {
-      data: res,
+      data: newRes,
       total,
       currentPage: page,
       nextPage,
@@ -83,16 +97,17 @@ export class ProductService {
     }
   }
 
-  // async searchAll(query): Promise<any> {
-
-  // }
-
   async findOne(id: number) {
-    const result = await this.productRepository.findOne({
+    const res = await this.productRepository.findOne({
       where: { id },
-      relations: ['category'],
+      relations: ['category', 'options'],
     })
-    return result;
+
+    const newRes = {
+      ...res,
+      reducedPercent: res?.reducedPrice ? Math.round(((res?.price - res?.reducedPrice) / res?.price) * 100) : 0
+    }
+    return newRes;
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
@@ -110,7 +125,6 @@ export class ProductService {
       const updatedProduct = await this.productRepository.findOneBy({ id });
       return updatedProduct;
     } catch (error) {
-      console.log("🚀 ~ ProductService ~ update ~ error:", error)
       throw new HttpException('Can not update product', HttpStatus.BAD_REQUEST)
     }
   }

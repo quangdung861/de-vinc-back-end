@@ -10,6 +10,8 @@ export class CreateProductDto {
     @IsNotEmpty()
     price: number;
 
+    reducedPrice: number;
+
     @IsNotEmpty()
     cost: number;
 

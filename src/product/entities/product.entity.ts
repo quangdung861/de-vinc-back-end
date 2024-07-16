@@ -1,5 +1,6 @@
 import { Category } from "src/category/entities/category.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Option } from "src/option/entities/option.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Product {
@@ -11,6 +12,9 @@ export class Product {
 
     @Column()
     price: number;
+
+    @Column()
+    reducedPrice: number;
 
     @Column()
     cost: number;
@@ -30,12 +34,15 @@ export class Product {
     @Column({ default: false })
     bestSelling: boolean;
 
-    @ManyToOne(() => Category, { nullable: true }) // Đặt nullable: true ở đây
+    @ManyToOne(() => Category, { nullable: true }) 
     @JoinColumn({ name: 'categoryId' })
     category: Category | null;
 
-    @Column({ nullable: true, default: null }) // Đặt nullable: true ở đây
+    @Column({ nullable: true, default: null }) 
     categoryId: number | null;
+
+    @OneToMany(() => Option, (option) => option.product, { nullable: true })
+    options: Option[];
 
     @CreateDateColumn()
     created_at: Date;

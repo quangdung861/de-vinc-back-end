@@ -5,6 +5,8 @@ export class UpdateProductDto {
 
     description: string;
 
+    reducedPrice: number;
+
     price: number;
 
     cost: number;
