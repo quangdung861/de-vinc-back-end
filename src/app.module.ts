@@ -7,8 +7,6 @@ import { AppService } from './app.service';
 import { CategoryModule } from './category/category.module';
 import { UserModule } from './user/user.module';
 import { ProductModule } from './product/product.module';
-import { SizeModule } from './size/size.module';
-import { ColorModule } from './color/color.module';
 
 @Module({
   imports: [
@@ -19,8 +17,6 @@ import { ColorModule } from './color/color.module';
     CategoryModule,
     UserModule,
     ProductModule,
-    SizeModule,
-    ColorModule,
   ],
   controllers: [AppController],
   providers: [AppService],

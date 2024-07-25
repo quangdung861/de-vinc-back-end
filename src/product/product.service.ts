@@ -14,21 +14,25 @@ export class ProductService {
     @InjectRepository(Category) private categoryRepository: Repository<Category>,
   ) { }
 
-  async create(createProductDto: CreateProductDto) {
-    const { categoryId, ...productData } = createProductDto;
-    const images = createProductDto.images.join('<&space>');
+  async create(body: any) {
+    const { categoryId, ...productData } = body;
+    console.log("🚀 ~ ProductService ~ create ~ productData:", productData.options[0].size)
+    const images = body.images.join('<&space>');
 
     const category = await this.categoryRepository.findOneBy({ id: categoryId });
+    const options = JSON.stringify(productData.options);
 
     try {
       const res = await this.productRepository.save({
         ...productData,
         images,
+        options,
         ...(category && { category: category })
       })
 
       return await this.productRepository.findOneBy({ id: res.id });
     } catch (error) {
+      console.log("🚀 ~ ProductService ~ create ~ error:", error)
       throw new HttpException('Can not create product', HttpStatus.BAD_REQUEST)
     }
   }
@@ -100,7 +104,7 @@ export class ProductService {
   async findOne(id: number) {
     const res = await this.productRepository.findOne({
       where: { id },
-      relations: ['category', 'options'],
+      relations: ['category'],
     })
 
     const newRes = {
@@ -110,9 +114,8 @@ export class ProductService {
     return newRes;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto) {
-    const { categoryId, images, ...productData } = updateProductDto;
-
+  async update(id: number, body: any) {
+    const { categoryId, images, options, ...productData } = body;
     const imageFormat = images.join('<&space>');
     const category = await this.categoryRepository.findOneBy({ id: categoryId });
 

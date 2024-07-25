@@ -31,7 +31,7 @@ export class ProductController {
       }
     }
   }))
-  create(@Req() req: any, @Body() createProductDto: CreateProductDto, @UploadedFiles() files: Express.Multer.File[]) {
+  create(@Req() req: any, @Body() createProductDto: any, @UploadedFiles() files: Express.Multer.File[]) {
     if (req.fileValidationError) {
       throw new BadRequestException(req.fileValidationError);
     }
@@ -39,9 +39,11 @@ export class ProductController {
       throw new BadRequestException('File is required');
     }
 
+    const body = JSON.parse(createProductDto.body);
+
     const images = files.map(file => `product/${file.filename}`);
 
-    return this.productService.create({ ...createProductDto, images });
+    return this.productService.create({ ...body, images });
   }
 
   @Get()
@@ -60,8 +62,9 @@ export class ProductController {
   }
 
   @Put(':id')
-  upload(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+  upload(@Param('id') id: string, @Body() updateProductDto: any) {
+    const body = updateProductDto;
+    return this.productService.update(+id, body);
   }
 
   @Post('uploads')

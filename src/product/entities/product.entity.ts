@@ -1,6 +1,4 @@
 import { Category } from "src/category/entities/category.entity";
-import { Color } from "src/color/entities/color.entity";
-import { Size } from "src/size/entities/size.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
@@ -14,8 +12,8 @@ export class Product {
     @Column()
     price: number;
 
-    @Column()
-    reducedPrice: number;
+    @Column({ nullable: true, default: null })
+    reducedPrice: number | null;
 
     @Column()
     cost: number;
@@ -42,11 +40,8 @@ export class Product {
     @Column({ nullable: true, default: null }) 
     categoryId: number | null;
 
-    @OneToMany(() => Color, (color) => color.product, { nullable: true })
-    colors: Color[];
-
-    @OneToMany(() => Size, (size) => size.product, { nullable: true })
-    sizes: Size[];
+    @Column({ type: 'longtext', nullable: true })
+    options: string;
 
     @CreateDateColumn()
     created_at: Date;
