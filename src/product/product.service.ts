@@ -16,9 +16,7 @@ export class ProductService {
 
   async create(body: any) {
     const { categoryId, ...productData } = body;
-    console.log("🚀 ~ ProductService ~ create ~ productData:", productData.options[0].size)
-    const images = body.images.join('<&space>');
-
+    const images = productData.images.join('<&space>');
     const category = await this.categoryRepository.findOneBy({ id: categoryId });
     const options = JSON.stringify(productData.options);
 
@@ -32,7 +30,6 @@ export class ProductService {
 
       return await this.productRepository.findOneBy({ id: res.id });
     } catch (error) {
-      console.log("🚀 ~ ProductService ~ create ~ error:", error)
       throw new HttpException('Can not create product', HttpStatus.BAD_REQUEST)
     }
   }
@@ -115,14 +112,16 @@ export class ProductService {
   }
 
   async update(id: number, body: any) {
-    const { categoryId, images, options, ...productData } = body;
+    const { categoryId, images, ...productData } = body;
     const imageFormat = images.join('<&space>');
     const category = await this.categoryRepository.findOneBy({ id: categoryId });
+    const options = JSON.stringify(body.options);
 
     try {
       await this.productRepository.update(id, {
         ...productData,
         images: imageFormat,
+        options,
         ...(category && { category: category })
       })
       const updatedProduct = await this.productRepository.findOneBy({ id });

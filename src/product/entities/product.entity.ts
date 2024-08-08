@@ -18,6 +18,9 @@ export class Product {
     @Column()
     cost: number;
 
+    @Column()
+    quantity: number;
+
     @Column({ type: 'int', default: 1 })
     status: number;
 
@@ -42,6 +45,9 @@ export class Product {
 
     @Column({ type: 'longtext', nullable: true })
     options: string;
+
+    @Column()
+    isOptions: boolean;
 
     @CreateDateColumn()
     created_at: Date;
