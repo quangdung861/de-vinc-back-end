@@ -103,9 +103,11 @@ export class ProductService {
       where: { id },
       relations: ['category'],
     })
+    const options = JSON.parse(res.options);
 
     const newRes = {
       ...res,
+      options,
       reducedPercent: res?.reducedPrice ? Math.round(((res?.price - res?.reducedPrice) / res?.price) * 100) : 0
     }
     return newRes;
