@@ -26,7 +26,7 @@ export const dataSourceOptions: DataSourceOptions = {
     entities: ['dist/**/*.entity.js'],
     migrations: ['dist/db/migrations/*.js'],
     migrationsTableName: "custom_migration_table",
-    synchronize: false
+    synchronize: true, // Tự tạo bảng
 }
 
 const dataSource = new DataSource(dataSourceOptions);
