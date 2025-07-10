@@ -133,7 +133,12 @@ export class ProductService {
     }
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const result = await this.productRepository.delete(id);
+    
+    if (result.affected === 0) {
+      throw new Error('Product not found');
+    }
     return `This action removes a #${id} product`;
   }
 }
