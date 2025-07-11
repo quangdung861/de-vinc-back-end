@@ -8,7 +8,10 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
-  const corsOrigin = configService.get<string>('DOMAIN_URL')
+  const allowedOrigins = [
+    configService.get<string>('DOMAIN_URL'),
+    configService.get<string>('DOMAIN_URL2'),
+  ];
   const config = new DocumentBuilder()
     .setTitle('De Vinc APIs')
     .setDescription('List APIs for De Vinc')
@@ -20,7 +23,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   app.enableCors({
-    origin: corsOrigin
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
   });
   app.useStaticAssets(join(__dirname, '../../uploads'));
   await app.listen(4000);
