@@ -7,7 +7,7 @@ import { FilterProductDto } from './dto/filter-product';
 import { storageConfig } from 'helpers/config';
 import { extname } from 'path';
 import { SearchProductDto } from './dto/search-product.dto';
-import { cloudinaryStorage } from 'src/cloudinary/cloudinary-storage.config';
+import { cloudinaryStorage } from '../cloudinary/cloudinary-storage.config';
 
 @Controller('products')
 export class ProductController {
