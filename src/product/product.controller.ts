@@ -7,6 +7,7 @@ import { FilterProductDto } from './dto/filter-product';
 import { storageConfig } from 'helpers/config';
 import { extname } from 'path';
 import { SearchProductDto } from './dto/search-product.dto';
+import { cloudinaryStorage } from 'src/cloudinary/cloudinary-storage.config';
 
 @Controller('products')
 export class ProductController {
@@ -38,34 +39,59 @@ export class ProductController {
     return this.productService.update(+id, body);
   }
 
+  // @Post('uploads')
+  // @UseInterceptors(FilesInterceptor('images', 20, {
+  //   storage: storageConfig('product'), fileFilter: (req, file, cb) => {
+  //     const ext = extname(file.originalname);
+  //     const allowedExtArr = ['.jpg', '.png', '.jpeg'];
+  //     if (!allowedExtArr.includes(ext)) {
+  //       req.fileValidationError = `Wrong extension type. Accepted file ext are: ${allowedExtArr.toString()}`
+  //       cb(null, false)
+  //     } else {
+  //       const fileSize = parseInt(req.headers['content-length']);
+  //       if (fileSize > 1024 * 1024 * 5) {
+  //         req.fileValidationError = 'File size is too large. Accepted file size is less than 5 MB';
+  //         cb(null, false);
+  //       } else {
+  //         cb(null, true);
+  //       }
+  //     }
+  //   }
+  // }))
+  // uploadImages(@Req() req: any, @UploadedFiles() files: Express.Multer.File[]) {
+  //   if (req.fileValidationError) {
+  //     throw new BadRequestException(req.fileValidationError);
+  //   }
+  //   if (!files) {
+  //     throw new BadRequestException('File is required');
+  //   }
+  //   const images = files.map(file => `product/${file.filename}`);
+  //   return images;
+  // }
+
   @Post('uploads')
   @UseInterceptors(FilesInterceptor('images', 20, {
-    storage: storageConfig('product'), fileFilter: (req, file, cb) => {
-      const ext = extname(file.originalname);
-      const allowedExtArr = ['.jpg', '.png', '.jpeg'];
+    storage: cloudinaryStorage,
+    fileFilter: (req, file, cb) => {
+      const ext = file.originalname.split('.').pop();
+      const allowedExtArr = ['jpg', 'png', 'jpeg'];
       if (!allowedExtArr.includes(ext)) {
-        req.fileValidationError = `Wrong extension type. Accepted file ext are: ${allowedExtArr.toString()}`
-        cb(null, false)
+        cb(new BadRequestException('Invalid file type'), false);
       } else {
-        const fileSize = parseInt(req.headers['content-length']);
-        if (fileSize > 1024 * 1024 * 5) {
-          req.fileValidationError = 'File size is too large. Accepted file size is less than 5 MB';
-          cb(null, false);
-        } else {
-          cb(null, true);
-        }
+        cb(null, true);
       }
-    }
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    },
   }))
-  uploadImages(@Req() req: any, @UploadedFiles() files: Express.Multer.File[]) {
-    if (req.fileValidationError) {
-      throw new BadRequestException(req.fileValidationError);
-    }
-    if (!files) {
+  async uploadImages(@UploadedFiles() files: Express.Multer.File[]) {
+    if (!files || files.length === 0) {
       throw new BadRequestException('File is required');
     }
-    const images = files.map(file => `product/${file.filename}`);
-    return images;
+
+    // Trả về danh sách URL ảnh đã upload lên Cloudinary
+    return files.map(file => file.path); // file.path là URL Cloudinary
   }
 
   @Delete(':id')
