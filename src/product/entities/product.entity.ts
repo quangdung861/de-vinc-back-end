@@ -49,6 +49,9 @@ export class Product {
     @Column()
     isOptions: boolean;
 
+    @Column({ type: 'longtext' })
+    highlights: string;
+
     @CreateDateColumn()
     created_at: Date;
 

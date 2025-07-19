@@ -14,7 +14,7 @@ export class ProductController {
   constructor(private productService: ProductService) { }
 
   @Post()
-  create(@Body() createProductDto: any) {
+  create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }
 

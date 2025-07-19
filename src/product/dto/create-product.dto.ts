@@ -1,24 +1,69 @@
-import { IsNotEmpty } from "class-validator";
+import { Type } from 'class-transformer';
+import {
+    IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+
+class SizeDto {
+  @IsString()
+  name: string;
+
+  @IsNumber()
+  price: number;
+
+  @IsNumber()
+  quantity: number;
+}
+
+class OptionDto {
+  @IsString()
+  color: string;
+
+  @IsNumber()
+  price: number;
+
+  @IsNumber()
+  quantity: number;
+
+  @ValidateNested({ each: true })
+  @Type(() => SizeDto)
+  sizes: SizeDto[];
+}
 
 export class CreateProductDto {
-    @IsNotEmpty()
-    name: string;
+  categoryId: number;
 
-    @IsNotEmpty()
-    description: string;
+  @IsNotEmpty()
+  cost: number;
 
-    @IsNotEmpty()
-    price: number;
+  @IsNotEmpty()
+  description: string;
 
-    reducedPrice: number;
+  @IsArray()
+  @IsString({ each: true })
+  highlights: string[];
 
-    @IsNotEmpty()
-    cost: number;
+  images: string[];
 
-    @IsNotEmpty()
-    status: number;
+  isOptions: boolean;
 
-    images: string[];
+  @IsNotEmpty()
+  name: string;
 
-    categoryId: number;
+  @ValidateNested({ each: true })
+  @Type(() => OptionDto)
+  options: OptionDto[];
+
+  @IsNotEmpty()
+  price: number;
+
+  quantity: number;
+
+  reducedPrice: number;
+
+  @IsNotEmpty()
+  status: number;
 }
