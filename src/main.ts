@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -11,6 +12,7 @@ async function bootstrap() {
   const allowedOrigins = [
     configService.get<string>('DOMAIN_URL'),
     configService.get<string>('DOMAIN_URL2'),
+    configService.get<string>('DOMAIN_URL_DEV'),
   ];
   const config = new DocumentBuilder()
     .setTitle('De Vinc APIs')
