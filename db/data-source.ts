@@ -4,11 +4,11 @@ const isLocal = process.env.NODE_ENV !== 'production'; // hoặc check biến kh
 
 const localConfig: DataSourceOptions = {
   type: 'mysql',
-  host: 'localhost',
-  port: 3306,
-  username: 'root',
-  password: '123456',
-  database: 'de-vinc-back-end',
+  host: process.env.DB_HOST_DEV,
+  port: +process.env.DB_PORT_DEV,
+  username: process.env.DB_USERNAME_DEV,
+  password: process.env.DB_PASSWORD_DEV,
+  database: process.env.DB_NAME_DEV,
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/db/migrations/*.js'],
   migrationsTableName: 'custom_migration_table',
