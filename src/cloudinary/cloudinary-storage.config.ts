@@ -7,7 +7,6 @@ export const cloudinaryStorage = new CloudinaryStorage({
     return {
       folder: 'product',
       allowed_formats: ['jpg', 'png', 'jpeg'],
-      transformation: [{ width: 800, height: 800, crop: 'limit' }],
     };
   },
 });
