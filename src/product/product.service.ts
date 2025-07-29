@@ -126,12 +126,14 @@ async findAll({ query, isSearch = false }): Promise<any> {
       id: categoryId,
     });
     const options = JSON.stringify(body.options);
+    const highlights = JSON.stringify(body.highlights);
 
     try {
       await this.productRepository.update(id, {
         ...productData,
         images: imageFormat,
         options,
+        highlights,
         ...(category && { category: category }),
       });
       const updatedProduct = await this.productRepository.findOneBy({ id });
