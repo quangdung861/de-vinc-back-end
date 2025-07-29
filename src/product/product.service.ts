@@ -38,75 +38,65 @@ export class ProductService {
     }
   }
 
-  async findAll({ query, isSearch = false }): Promise<any> {
-    const items_per_page = Number(query.items_per_page) || 10;
-    const page = Number(query.page) || 1;
-    const q = query.q || ``;
-    const sortValue = query.sortValue || `created_at`;
-    const order = query.order || 'DESC';
-    const categoryId = query.categoryId || null;
-    const skip = (page - 1) * items_per_page;
-    const bestSelling = query.bestSelling || null;
+async findAll({ query, isSearch = false }): Promise<any> {
+  const itemsPerPage = Number(query.items_per_page) || 10;
+  const page = Number(query.page) || 1;
+  const skip = (page - 1) * itemsPerPage;
 
-    if (isSearch) {
-      if (!q) return { data: [], total: 0 };
-    }
+  const q = query.q?.trim() || '';
+  const sortValue = query.sortValue || 'created_at';
+  const order: 'ASC' | 'DESC' = query.order === 'ASC' ? 'ASC' : 'DESC';
+  const categoryId = query.categoryId ? Number(query.categoryId) : null;
+  const bestSelling = query.bestSelling !== undefined ? query.bestSelling === 'true' : null;
 
-    const whereConditions: any[] = [
-      {
-        name: Like('%' + q + '%'),
-      },
-      {
-        description: Like('%' + q + '%'),
-      },
-    ];
-
-    if (categoryId) {
-      whereConditions.forEach((item) => (item['categoryId'] = categoryId));
-    }
-
-    if (bestSelling !== null) {
-      whereConditions.forEach((condition) => {
-        condition.bestSelling = bestSelling;
-      });
-    }
-
-    const [res, total] = await this.productRepository.findAndCount({
-      where: whereConditions,
-      relations: ['category'],
-      order: {
-        [sortValue]: order,
-      },
-      take: items_per_page,
-      skip: skip,
-    });
-
-    const lastPage = Math.ceil(total / items_per_page);
-    const nextPage = page + 1 > lastPage ? null : page + 1;
-    const prevPage = page - 1 < 1 ? null : page - 1;
-
-    const newRes = res.map((item) => {
-      const highlights = JSON.parse(item.highlights);
-      const images = JSON.parse(item.images);
-      return {
-        ...item,
-        highlights,
-        images,
-        reducedPercent: item?.reducedPrice
-          ? Math.round(((item?.price - item?.reducedPrice) / item?.price) * 100)
-          : 0,
-      };
-    });
-
-    return {
-      data: newRes,
-      total,
-      currentPage: page,
-      nextPage,
-      prevPage,
-      lastPage,
-    };
+  if (isSearch && !q) {
+    return { data: [], total: 0 };
   }
+
+  // Tạo điều kiện lọc linh hoạt
+  const baseCondition: any = {};
+  if (categoryId) baseCondition.categoryId = categoryId;
+  if (bestSelling !== null) baseCondition.bestSelling = bestSelling;
+
+  const whereConditions: any[] = [];
+
+  if (q) {
+    whereConditions.push(
+      { ...baseCondition, name: Like(`%${q}%`) },
+      { ...baseCondition, description: Like(`%${q}%`) }
+    );
+  } else {
+    whereConditions.push(baseCondition);
+  }
+
+  const [res, total] = await this.productRepository.findAndCount({
+    where: whereConditions,
+    relations: ['category'],
+    order: { [sortValue]: order },
+    take: itemsPerPage,
+    skip,
+  });
+
+  const lastPage = Math.ceil(total / itemsPerPage);
+  const newRes = res.map((item) => ({
+    ...item,
+    highlights: JSON.parse(item.highlights || '[]'),
+    images: JSON.parse(item.images || '[]'),
+    reducedPercent: item?.reducedPrice
+      ? Math.round(((item.price - item.reducedPrice) / item.price) * 100)
+      : 0,
+  }));
+
+  return {
+    data: newRes,
+    total,
+    currentPage: page,
+    nextPage: page + 1 > lastPage ? null : page + 1,
+    prevPage: page - 1 < 1 ? null : page - 1,
+    lastPage,
+  };
+}
+
 
   async findOne(id: number) {
     const res = await this.productRepository.findOne({
