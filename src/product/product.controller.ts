@@ -99,28 +99,61 @@ export class ProductController {
     return this.productService.remove(+id);
   }
 
-  @Post('cke-upload')
-  @UseInterceptors(FileInterceptor('upload', {
-    storage: storageConfig('ckeditor'), fileFilter: (req, file, cb) => {
-      const ext = extname(file.originalname);
-      const allowedExtArr = ['.jpg', '.png', '.jpeg'];
-      if (!allowedExtArr.includes(ext)) {
-        req.fileValidationError = `Wrong extension type. Accepted file ext are: ${allowedExtArr.toString()}`
-        cb(null, false)
-      } else {
-        const fileSize = parseInt(req.headers['content-length']);
-        if (fileSize > 1024 * 1024 * 5) {
-          req.fileValidationError = 'File size is too large. Accepted file size is less than 5 MB';
+  // @Post('cke-upload')
+  // @UseInterceptors(FileInterceptor('upload', {
+  //   storage: storageConfig('ckeditor'), fileFilter: (req, file, cb) => {
+  //     const ext = extname(file.originalname);
+  //     const allowedExtArr = ['.jpg', '.png', '.jpeg'];
+  //     if (!allowedExtArr.includes(ext)) {
+  //       req.fileValidationError = `Wrong extension type. Accepted file ext are: ${allowedExtArr.toString()}`
+  //       cb(null, false)
+  //     } else {
+  //       const fileSize = parseInt(req.headers['content-length']);
+  //       if (fileSize > 1024 * 1024 * 5) {
+  //         req.fileValidationError = 'File size is too large. Accepted file size is less than 5 MB';
+  //         cb(null, false);
+  //       } else {
+  //         cb(null, true);
+  //       }
+  //     }
+  //   }
+  // }))
+  // ckeUpload(@Body() data: any, @UploadedFile() file: Express.Multer.File) {
+  //   return {
+  //     'url': `ckeditor/${file.filename}`
+  //   }
+  // }
+
+    @Post('cke-upload')
+    @UseInterceptors(FileInterceptor('upload', {
+      storage: cloudinaryStorage,
+      fileFilter: (req, file, cb) => {
+        const ext = file.originalname.split('.').pop()?.toLowerCase();
+        const allowedExtArr = ['jpg', 'jpeg', 'png'];
+        if (!allowedExtArr.includes(ext)) {
+          req.fileValidationError = `Invalid file type. Accepted types: ${allowedExtArr.join(', ')}`;
           cb(null, false);
         } else {
-          cb(null, true);
+          const fileSize = parseInt(req.headers['content-length']);
+          if (fileSize > 5 * 1024 * 1024) {
+            req.fileValidationError = 'File size exceeds 5MB';
+            cb(null, false);
+          } else {
+            cb(null, true);
+          }
         }
+      },
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB
+      },
+    }))
+    ckeUpload(@UploadedFile() file: Express.Multer.File, @Body() data: any) {
+      if (!file) {
+        throw new BadRequestException('No file uploaded or file invalid');
       }
+      
+      return {
+        url: file.path, // Cloudinary trả về URL tại file.path
+      };
     }
-  }))
-  ckeUpload(@Body() data: any, @UploadedFile() file: Express.Multer.File) {
-    return {
-      'url': `ckeditor/${file.filename}`
-    }
-  }
 }
