@@ -59,11 +59,9 @@ async findAll({ query, isSearch = false }): Promise<any> {
   if (bestSelling !== null) baseCondition.bestSelling = bestSelling;
 
   const whereConditions: any[] = [];
-
   if (q) {
     whereConditions.push(
       { ...baseCondition, name: Like(`%${q}%`) },
-      { ...baseCondition, description: Like(`%${q}%`) }
     );
   } else {
     whereConditions.push(baseCondition);
@@ -86,7 +84,6 @@ async findAll({ query, isSearch = false }): Promise<any> {
       ? Math.round(((item.price - item.reducedPrice) / item.price) * 100)
       : 0,
   }));
-
   return {
     data: newRes,
     total,
