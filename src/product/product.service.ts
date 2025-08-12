@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository  } from '@nestjs/typeorm';
+import { Raw } from "typeorm";
 import { Like, Repository, UpdateResult } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -60,9 +61,13 @@ async findAll({ query, isSearch = false }): Promise<any> {
 
   const whereConditions: any[] = [];
   if (q) {
-    whereConditions.push(
-      { ...baseCondition, name: Like(`%${q}%`) },
-    );
+    whereConditions.push({
+      ...baseCondition,
+      name: Raw(
+        alias => `LOWER(${alias}) RLIKE CONCAT('(^|[[:space:]])', LOWER(:word), '($|[[:space:]])')`,
+        { word: q }
+      )
+    });
   } else {
     whereConditions.push(baseCondition);
   }
