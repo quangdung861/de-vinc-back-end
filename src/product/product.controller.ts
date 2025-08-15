@@ -74,7 +74,7 @@ export class ProductController {
     storage: cloudinaryStorage,
     fileFilter: (req, file, cb) => {
       const ext = file.originalname.split('.').pop();
-      const allowedExtArr = ['jpg', 'png', 'jpeg'];
+      const allowedExtArr = ['jpg', 'jpeg', 'png', 'JPG', 'JPEG', 'PNG'];
       if (!allowedExtArr.includes(ext)) {
         cb(new BadRequestException('Invalid file type'), false);
       } else {
@@ -129,7 +129,7 @@ export class ProductController {
       storage: cloudinaryStorage,
       fileFilter: (req, file, cb) => {
         const ext = file.originalname.split('.').pop()?.toLowerCase();
-        const allowedExtArr = ['jpg', 'jpeg', 'png'];
+        const allowedExtArr = ['jpg', 'jpeg', 'png', 'JPG', 'JPEG', 'PNG'];
         if (!allowedExtArr.includes(ext)) {
           req.fileValidationError = `Invalid file type. Accepted types: ${allowedExtArr.join(', ')}`;
           cb(null, false);
