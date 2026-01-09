@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -9,31 +8,60 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
-  const allowedOrigins = [
-    configService.get<string>('DOMAIN_URL'),
-    configService.get<string>('DOMAIN_URL2'),
-    configService.get<string>('DOMAIN_URL_DEV'),
-  ];
-  const config = new DocumentBuilder()
-    .setTitle('De Vinc APIs')
-    .setDescription('List APIs for De Vinc')
-    .setVersion('1.0')
-    .addTag('Auth')
-    .addTag('Users')
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  const nodeEnv = configService.get<string>('NODE_ENV');
+
+  /* =======================
+     CORS CONFIG
+  ======================= */
+  const allowedOrigins =
+    configService
+      .get<string>('CLIENT_ORIGINS')
+      ?.split(',')
+      .map((o) => o.trim()) ?? [];
+
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error(`Not allowed by CORS`));
       }
     },
+    credentials: true,
   });
+
+  /* =======================
+     SWAGGER
+  ======================= */
+  if (nodeEnv !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('De Vinc APIs')
+      .setDescription('List APIs for De Vinc')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addTag('Auth')
+      .addTag('Users')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api', app, document);
+  }
+
+  /* =======================
+     STATIC FILES
+  ======================= */
   app.useStaticAssets(join(__dirname, '../../uploads'));
-  await app.listen(process.env.PORT || 8080);
+
+  /* =======================
+     SERVER
+  ======================= */
+  const port = configService.get<number>('PORT') || 8080;
+  await app.listen(port);
+
+  if (nodeEnv !== 'production') {
+    console.log(`Server running on port ${port}`);
+    console.log(`Environment: ${nodeEnv}`);
+  }
 }
+
 bootstrap();
