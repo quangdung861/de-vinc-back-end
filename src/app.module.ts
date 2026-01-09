@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 import { CategoryModule } from './category/category.module';
 import { UserModule } from './user/user.module';
 import { ProductModule } from './product/product.module';
-import { typeOrmConfig } from 'config/typeorm.config';
+import { typeOrmConfig } from '../config/typeorm.config';
 
 @Module({
   imports: [
