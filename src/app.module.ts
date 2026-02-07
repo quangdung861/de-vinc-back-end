@@ -12,7 +12,6 @@ import { typeOrmConfig } from '../config/typeorm.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Set this module to global so you don't need to import it again in other modules.
-      envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

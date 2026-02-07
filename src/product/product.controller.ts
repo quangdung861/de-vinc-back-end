@@ -2,10 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Que
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { FilterProductDto } from './dto/filter-product';
-import { storageConfig } from 'helpers/config';
-import { extname } from 'path';
 import { SearchProductDto } from './dto/search-product.dto';
 import { cloudinaryStorage } from '../cloudinary/cloudinary-storage.config';
 
@@ -39,36 +36,6 @@ export class ProductController {
     return this.productService.update(+id, body);
   }
 
-  // @Post('uploads')
-  // @UseInterceptors(FilesInterceptor('images', 20, {
-  //   storage: storageConfig('product'), fileFilter: (req, file, cb) => {
-  //     const ext = extname(file.originalname);
-  //     const allowedExtArr = ['.jpg', '.png', '.jpeg'];
-  //     if (!allowedExtArr.includes(ext)) {
-  //       req.fileValidationError = `Wrong extension type. Accepted file ext are: ${allowedExtArr.toString()}`
-  //       cb(null, false)
-  //     } else {
-  //       const fileSize = parseInt(req.headers['content-length']);
-  //       if (fileSize > 1024 * 1024 * 5) {
-  //         req.fileValidationError = 'File size is too large. Accepted file size is less than 5 MB';
-  //         cb(null, false);
-  //       } else {
-  //         cb(null, true);
-  //       }
-  //     }
-  //   }
-  // }))
-  // uploadImages(@Req() req: any, @UploadedFiles() files: Express.Multer.File[]) {
-  //   if (req.fileValidationError) {
-  //     throw new BadRequestException(req.fileValidationError);
-  //   }
-  //   if (!files) {
-  //     throw new BadRequestException('File is required');
-  //   }
-  //   const images = files.map(file => `product/${file.filename}`);
-  //   return images;
-  // }
-
   @Post('uploads')
   @UseInterceptors(FilesInterceptor('images', 20, {
     storage: cloudinaryStorage,
@@ -98,31 +65,6 @@ export class ProductController {
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
-
-  // @Post('cke-upload')
-  // @UseInterceptors(FileInterceptor('upload', {
-  //   storage: storageConfig('ckeditor'), fileFilter: (req, file, cb) => {
-  //     const ext = extname(file.originalname);
-  //     const allowedExtArr = ['.jpg', '.png', '.jpeg'];
-  //     if (!allowedExtArr.includes(ext)) {
-  //       req.fileValidationError = `Wrong extension type. Accepted file ext are: ${allowedExtArr.toString()}`
-  //       cb(null, false)
-  //     } else {
-  //       const fileSize = parseInt(req.headers['content-length']);
-  //       if (fileSize > 1024 * 1024 * 5) {
-  //         req.fileValidationError = 'File size is too large. Accepted file size is less than 5 MB';
-  //         cb(null, false);
-  //       } else {
-  //         cb(null, true);
-  //       }
-  //     }
-  //   }
-  // }))
-  // ckeUpload(@Body() data: any, @UploadedFile() file: Express.Multer.File) {
-  //   return {
-  //     'url': `ckeditor/${file.filename}`
-  //   }
-  // }
 
     @Post('cke-upload')
     @UseInterceptors(FileInterceptor('upload', {
