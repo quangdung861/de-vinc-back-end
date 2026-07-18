@@ -7,7 +7,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { Category } from '../category/entities/category.entity';
-import { BaseService } from 'src/helpers/base.service';
+import { BaseService } from '../helpers/base.service';
 
 @Injectable()
 export class ProductService extends BaseService<Product> {
