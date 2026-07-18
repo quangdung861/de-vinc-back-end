@@ -8,7 +8,6 @@ import {
   Delete,
   UseInterceptors,
   Query,
-  Req,
   UploadedFile,
   UploadedFiles,
   BadRequestException,
@@ -20,6 +19,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { FilterProductDto } from './dto/filter-product';
 import { SearchProductDto } from './dto/search-product.dto';
 import { cloudinaryStorage } from '../cloudinary/cloudinary-storage.config';
+import { Role } from 'src/common/middlewares/role.decorator';
 
 @Controller('products')
 export class ProductController {
@@ -31,18 +31,21 @@ export class ProductController {
   }
 
   @Get()
-  findAll(@Query() query: FilterProductDto): Promise<any> {
-    return this.productService.findAll({ query });
+  findAll(
+    @Query() query: FilterProductDto,
+    @Role() role: string,
+  ): Promise<any> {
+    return this.productService.findAll({ query, role });
   }
 
   @Get('search')
-  search(@Query() query: SearchProductDto): Promise<any> {
-    return this.productService.findAll({ query, isSearch: true });
+  search(@Query() query: SearchProductDto, @Role() role: string): Promise<any> {
+    return this.productService.findAll({ query, role, isSearch: true });
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne(+id);
+  findOne(@Param('id') id: string, @Role() role: string) {
+    return this.productService.findOne({ id, role });
   }
 
   @Put(':id')
@@ -82,7 +85,7 @@ export class ProductController {
         '/upload/',
         '/upload/w_400,h_400,c_fill,q_auto,f_auto/',
       );
-      
+
       return {
         original,
         thumbnail,
