@@ -19,7 +19,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { FilterProductDto } from './dto/filter-product';
 import { SearchProductDto } from './dto/search-product.dto';
 import { cloudinaryStorage } from '../cloudinary/cloudinary-storage.config';
-import { Role } from 'src/common/middlewares/role.decorator';
+import { Role } from '../common/middlewares/role.decorator';
 
 @Controller('products')
 export class ProductController {
